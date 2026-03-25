@@ -1,0 +1,103 @@
+﻿@model IEnumerable<PaginaWebPrueba.Models.Producto>
+
+@{
+    ViewData["Title"] = "Almacén Supermercado";
+}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+<style>
+    body { background-color: #f8f9fa; }
+    .card-header { background: #198754; color: white; }
+    .ui-autocomplete { z-index: 2147483647; font-family: sans-serif; }
+    .badge-categoria { font-size: 0.85em; }
+</style>
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Inventario General de Almacén</h3>
+            <span class="badge bg-light text-dark">Total: @(Model?.Count() ?? 0) Items</span>
+        </div>
+        <div class="card-body">
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label for="txtBuscador" class="form-label fw-bold text-success">Buscar Producto (Autocomplete):</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-success text-white"><i class="bi bi-search">Busqueda</i></span>
+                        <input type="text" id="txtBuscador" class="form-control" placeholder="Escribe el nombre del producto...">
+                    </div>
+                </div>
+            </div>
+
+            <table id="tablaProductos" class="table table-hover border">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Descripción</th>
+                        <th>Categoría</th>
+                        <th>Precio Unit.</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null)
+                    {
+                        foreach (var p in Model)
+                        {
+                            <tr>
+                                <td>@p.Id</td>
+                                <td class="fw-bold">@p.Nombre</td>
+                                <td><span class="badge bg-info text-dark badge-categoria">@p.Categoria</span></td>
+                                <td class="text-end">$ @p.Precio.ToString("N2")</td>
+                                <td>
+                                    <button class="btn btn-outline-primary btn-sm">ver</button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Inicializar DataTables
+            var table = $('#tablaProductos').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+                },
+                "responsive": true,
+                "pageLength": 10
+            });
+
+            // Inicializar Autocomplete
+            $("#txtBuscador").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: '@Url.Action("BuscarProductos", "Home")', // Asegúrate que el controller sea 'Home'
+                        type: "GET",
+                        data: { term: request.term },
+                        success: function (data) {
+                            response(data);
+                        }
+                    });
+                },
+                select: function (event, ui) {
+                    // Al seleccionar, filtramos la tabla automáticamente
+                    table.search(ui.item.value).draw();
+                }
+            });
+        });
+    </script>
+}
