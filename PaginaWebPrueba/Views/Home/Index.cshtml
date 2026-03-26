@@ -51,7 +51,7 @@
                                 <td>@p.Id</td>
                                 <td class="fw-bold">@p.Nombre</td>
                                 <td><span class="badge bg-info text-dark badge-categoria">@p.Categoria</span></td>
-                                <td class="text-end">$ @p.Precio.ToString("N2")</td>
+                                <td class="text-end">€ @p.Precio.ToString("N2")</td>
                                 <td>
                                     <button class="btn btn-outline-primary btn-sm">ver</button>
                                 </td>
@@ -85,7 +85,7 @@
             $("#txtBuscador").autocomplete({
                 source: function (request, response) {
                     $.ajax({
-                        url: '@Url.Action("BuscarProductos", "Home")', // Asegúrate que el controller sea 'Home'
+                        url: '@Url.Action("BuscarProductos", "Home")',
                         type: "GET",
                         data: { term: request.term },
                         success: function (data) {
